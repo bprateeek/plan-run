@@ -6,25 +6,26 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <meta name="theme-color" content="#16140f" />
+    <meta name="theme-color" content="#003049" />
     <title>Plan-Run: Race Training</title>
     <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
       :root {
-        --ink: #16140f;
-        --paper: #f4f1ea;
-        --accent: #ff4d1c;
-        --line: #dcd6c8;
-        --done: #5b8c5a;
-        --mut: #8a8576;
-        --z-easy: #5b8c5a;
-        --z-mar: #ff4d1c;
-        --z-thr: #c9851f;
-        --z-int: #b23a2e;
+        --ink: #003049;
+        --paper: #fdf0d5;
+        --accent: #c1121f;
+        --line: #e3d4ad;
+        --done: #669bbc;
+        --mut: #5f7d8c;
+        --z-easy: #669bbc;
+        --z-mar: #c1121f;
+        --z-thr: #780000;
+        --z-int: #003049;
       }
       * {
         box-sizing: border-box;
@@ -34,11 +35,12 @@
         background: var(--paper);
         color: var(--ink);
         font-family: "Archivo", system-ui, sans-serif;
-        padding: 26px 18px calc(70px + env(safe-area-inset-bottom));
+        padding: 18px 14px calc(64px + env(safe-area-inset-bottom));
         -webkit-font-smoothing: antialiased;
+        overflow-wrap: anywhere;
       }
       .wrap {
-        max-width: 880px;
+        max-width: 600px;
         margin: 0 auto;
       }
       h1 {
@@ -72,13 +74,14 @@
         gap: 6px;
       }
       .btn {
-        padding: 8px 13px;
+        padding: 11px 14px;
         border: 1.5px solid var(--ink);
         background: transparent;
         color: var(--ink);
         cursor: pointer;
         font-family: "JetBrains Mono", monospace;
         font-size: 13px;
+        min-height: 44px;
       }
       .btn.active {
         background: var(--ink);
@@ -126,12 +129,13 @@
       }
       input,
       select {
-        padding: 9px;
+        padding: 11px;
         border: 1.5px solid var(--ink);
         background: transparent;
         font-family: "JetBrains Mono", monospace;
-        font-size: 13px;
+        font-size: 16px;
         color: var(--ink);
+        min-height: 44px;
       }
       input {
         width: 100%;
@@ -147,7 +151,7 @@
         margin-bottom: 20px;
       }
       .err {
-        color: #b23a2e;
+        color: var(--accent);
         font-family: "JetBrains Mono", monospace;
         font-size: 13px;
         margin-top: 12px;
@@ -157,8 +161,8 @@
         padding: 10px 14px;
         margin-bottom: 16px;
         font-size: 13px;
-        color: #8a3a1c;
-        background: #fbe9e2;
+        color: #780000;
+        background: #fbe1e0;
       }
       .bar {
         height: 8px;
@@ -204,50 +208,55 @@
         border-bottom: 1px solid var(--line);
       }
       .wk .h.taper {
-        background: #efe9da;
+        background: #f3e6c4;
       }
-      .days {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
+      .daylist {
+        display: flex;
+        flex-direction: column;
       }
-      .cell {
-        padding: 7px 7px 9px;
-        border-right: 1px solid var(--line);
-        min-height: 84px;
+      .drow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 14px;
+        border-top: 1px solid var(--line);
         cursor: pointer;
-        position: relative;
       }
-      .cell:last-child {
-        border-right: none;
+      .drow:first-child {
+        border-top: none;
       }
-      .cell.rest {
-        background: #efe9da;
+      .drow.rest {
+        padding: 5px 14px;
+        color: var(--mut);
         cursor: default;
       }
-      .cell.done {
-        background: #e8f0e6;
+      .drow.done {
+        background: #e2edf3;
       }
-      .cell.skip {
-        background: #f0ece0;
+      .drow.skip {
+        background: #efe3c6;
       }
-      .cell.today {
-        background: #fbe9e2;
+      .drow.today {
+        background: #fbe1e0;
       }
-      .cell .dn {
-        display: flex;
-        justify-content: space-between;
+      .drow .dt {
+        flex: 0 0 88px;
+        line-height: 1.2;
       }
-      .cell .ck {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        color: var(--done);
-        font-weight: 700;
+      .drow .wo {
+        flex: 1;
+        min-width: 0;
+        line-height: 1.25;
+      }
+      .drow .di {
+        flex: 0 0 auto;
+        text-align: right;
+        white-space: nowrap;
       }
       .editor {
         border-top: 1.5px dashed var(--line);
         padding: 12px 14px;
-        background: #fbf9f3;
+        background: #fdf6e3;
       }
       .tag {
         font-family: "JetBrains Mono", monospace;
@@ -257,20 +266,70 @@
         padding: 2px 8px;
         border: 1px solid var(--ink);
       }
-      .install {
+      .pwa {
         position: fixed;
-        left: 50%;
-        transform: translateX(-50%);
-        bottom: calc(14px + env(safe-area-inset-bottom));
+        left: 0;
+        right: 0;
+        bottom: 0;
         background: var(--ink);
         color: var(--paper);
-        padding: 10px 18px;
-        border: none;
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+        display: none;
+        align-items: center;
+        gap: 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        z-index: 20;
+      }
+      .pwa.show {
+        display: flex;
+      }
+      .pwa .msg {
+        flex: 1;
+        line-height: 1.3;
+      }
+      .pwa .msg small {
+        color: var(--steel, #9bbdd6);
+        font-size: 11px;
+      }
+      .pwa button {
         font-family: "JetBrains Mono", monospace;
         font-size: 13px;
         cursor: pointer;
+      }
+      #pwaInstall {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        padding: 10px 14px;
+      }
+      #pwaClose {
+        background: transparent;
+        color: var(--paper);
+        border: none;
+        font-size: 20px;
+        line-height: 1;
+        padding: 4px 6px;
+      }
+      .today-fab {
+        position: fixed;
+        right: 14px;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 22px;
+        padding: 10px 16px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 3px 10px rgba(0, 48, 73, 0.35);
         display: none;
-        z-index: 5;
+        z-index: 15;
+      }
+      .today-fab.show {
+        display: block;
       }
     </style>
   </head>
@@ -285,7 +344,12 @@
       </div>
       <div id="app"></div>
     </div>
-    <button class="install" id="install">Install app ↓</button>
+    <button class="today-fab" id="todayFab">↑ Today</button>
+    <div class="pwa" id="pwaBanner">
+      <div class="msg" id="pwaMsg">Install PLAN-RUN for offline use.</div>
+      <button id="pwaInstall">Install</button>
+      <button id="pwaClose" aria-label="Dismiss">×</button>
+    </div>
 
     <script>
       "use strict";
@@ -337,7 +401,7 @@
         Marathon: "var(--z-mar)",
         Threshold: "var(--z-thr)",
         Interval: "var(--z-int)",
-        rest: "#b6b0a3",
+        rest: "#9aa7ad",
       };
       function fmtPace(m) {
         if (!isFinite(m) || m <= 0) return "—";
@@ -817,9 +881,87 @@
       }
 
       // ===========================================================================
+      // CALENDAR EXPORT - .ics (all-day events, offline)
+      // ===========================================================================
+      function buildICS() {
+        if (!S.plan || !S.meta) return;
+        const v = vinfo();
+        const tu = toUnit();
+        const icsDate = (d) =>
+          `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+        const escICS = (s) =>
+          String(s).replace(/[\\;,]/g, (c) => "\\" + c).replace(/\n/g, "\\n");
+        const fold = (line) => {
+          // RFC 5545: lines longer than 75 octets are folded with CRLF + space
+          let out = "";
+          while (line.length > 73) {
+            out += line.slice(0, 73) + "\r\n ";
+            line = line.slice(73);
+          }
+          return out + line;
+        };
+        const stamp = icsDate(new Date()) + "T000000Z";
+        let paceLine = "";
+        if (v.has) {
+          paceLine =
+            "\\nPaces: " +
+            Object.entries(ZONES)
+              .map(([k, z]) => {
+                const lo = fmtPace(paceMinPerKm(v.vdot, z.hi) * tu),
+                  hi = fmtPace(paceMinPerKm(v.vdot, z.lo) * tu);
+                return `${z.label} ${lo === hi ? lo : lo + "-" + hi}/${S.unit}`;
+              })
+              .join("  ");
+        }
+        const ev = [];
+        S.plan.forEach((wk) =>
+          wk.days.forEach((d, i) => {
+            if (d.type === "Rest") return;
+            const dt = addDays(S.meta.start, (wk.week - 1) * 7 + i);
+            const end = addDays(dt, 1);
+            const dist = d.km > 0 ? ` ${dlabel(d.km)}${S.unit}` : "";
+            const race = d.type === "RACE DAY";
+            const summary = `${race ? "🏁 " : ""}PLAN-RUN — ${d.type}${dist}`;
+            const desc = `${d.note}  (W${String(wk.week).padStart(2, "0")} · ${wk.phase})${paceLine}`;
+            ev.push(
+              [
+                "BEGIN:VEVENT",
+                fold(`UID:${d.key}@plan-run`),
+                `DTSTAMP:${stamp}`,
+                `DTSTART;VALUE=DATE:${icsDate(dt)}`,
+                `DTEND;VALUE=DATE:${icsDate(end)}`,
+                fold(`SUMMARY:${escICS(summary)}`),
+                fold(`DESCRIPTION:${escICS(desc)}`),
+                "END:VEVENT",
+              ].join("\r\n"),
+            );
+          }),
+        );
+        const ics = [
+          "BEGIN:VCALENDAR",
+          "VERSION:2.0",
+          "PRODID:-//PLAN-RUN//Race Training//EN",
+          "CALSCALE:GREGORIAN",
+          `X-WR-CALNAME:PLAN-RUN ${escICS(S.meta.raceType)}`,
+          ...ev,
+          "END:VCALENDAR",
+        ].join("\r\n");
+        const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "plan-run.ics";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      // ===========================================================================
       // RENDER
       // ===========================================================================
       function setTab(t) {
+        if (t === "plan" && S.tab !== "plan") scrollPending = true;
         S.tab = t;
         render();
       }
@@ -835,6 +977,7 @@
         app.innerHTML = S.tab === "setup" ? setupHTML() : planHTML();
         if (S.tab === "setup") wireSetup();
         else wirePlan();
+        if (typeof setupTodayNav === "function") setupTodayNav();
       }
 
       function setupHTML() {
@@ -1023,7 +1166,7 @@
                   hi = fmtPace(paceMinPerKm(v.vdot, z.lo) * tu);
                 const rng =
                   lo === hi ? `${lo} /${S.unit}` : `${lo}–${hi} /${S.unit}`;
-                return `<div class="zone" style="border-left:5px solid ${ZCOL[k]}"><div class="t"><span class="mono" style="font-weight:700;font-size:13px;text-transform:uppercase">${z.label}</span><span class="mono" style="font-size:15px;font-weight:700;color:${ZCOL[k]}">${rng}</span></div><p style="margin:5px 0 0;font-size:12px;color:#6f6a5d">${z.desc}</p></div>`;
+                return `<div class="zone" style="border-left:5px solid ${ZCOL[k]}"><div class="t"><span class="mono" style="font-weight:700;font-size:13px;text-transform:uppercase">${z.label}</span><span class="mono" style="font-size:15px;font-weight:700;color:${ZCOL[k]}">${rng}</span></div><p style="margin:5px 0 0;font-size:12px;color:var(--mut)">${z.desc}</p></div>`;
               })
               .join("") +
             `</div></div>`;
@@ -1043,46 +1186,46 @@
                 const dt = addDays(S.meta.start, (wk.week - 1) * 7 + i);
                 const isToday = sameDay(dt, today);
                 const isRest = d.type === "Rest";
-                const cls = ["cell"];
+                const cls = ["drow"];
                 if (isRest) cls.push("rest");
                 else if (e && e.status === "done") cls.push("done");
                 else if (e && e.status === "skipped") cls.push("skip");
                 else if (isToday) cls.push("today");
-                const body = isRest
-                  ? `<div class="mono" style="font-size:11px;color:#b6b0a3;margin-top:8px">rest</div>`
-                  : `<div style="font-weight:700;font-size:11.5px;margin-top:3px;color:${d.type === "RACE DAY" ? "var(--accent)" : "var(--ink)"};${e && e.status === "skipped" ? "text-decoration:line-through" : ""}">${esc(d.type)}</div>
-          ${d.km > 0 ? `<div class="mono" style="font-size:13px;font-weight:700">${dlabel(e && e.km != null ? e.km : d.km)}<span style="font-size:9px;color:#a39e90"> ${S.unit}</span></div>` : ""}
-          <div style="font-size:9px;color:var(--mut);margin-top:1px;line-height:1.2">${esc(d.note)}</div>
-          ${e && e.status === "done" ? `<span class="ck">✓</span>` : ""}`;
-                return `<div class="${cls.join(" ")}" ${isRest ? "" : `data-cell="${d.key}"`}>
-        <div class="dn"><span class="mono" style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:${isToday ? "var(--accent)" : "#a39e90"};font-weight:${isToday ? 700 : 400}">${DAY_NAMES[i]}</span>
-        <span class="mono" style="font-size:8px;color:#bcb6a8">${fmtDate(dt)}</span></div>${body}</div>`;
+                const dayCol = `<div class="dt"><div class="mono" style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:${isToday ? "var(--accent)" : "var(--mut)"};font-weight:${isToday ? 700 : 400}">${DAY_NAMES[i]}</div><div class="mono" style="font-size:10px;color:#9aa7ad">${fmtDate(dt)}</div></div>`;
+                if (isRest) {
+                  return `<div class="${cls.join(" ")}">${dayCol}<div class="wo mono" style="font-size:11px">rest</div></div>`;
+                }
+                const row = `<div class="${cls.join(" ")}" data-cell="${d.key}">${dayCol}
+        <div class="wo">
+          <div style="font-weight:700;font-size:14px;color:${d.type === "RACE DAY" ? "var(--accent)" : "var(--ink)"};${e && e.status === "skipped" ? "text-decoration:line-through" : ""}">${esc(d.type)}</div>
+          <div style="font-size:11px;color:var(--mut)">${esc(d.note)}</div>
+        </div>
+        <div class="di">${d.km > 0 ? `<span class="mono" style="font-size:14px;font-weight:700">${dlabel(e && e.km != null ? e.km : d.km)}</span><span class="mono" style="font-size:10px;color:#9aa7ad"> ${S.unit}</span>` : ""}${e && e.status === "done" ? `<span style="color:var(--done);font-weight:700;margin-left:6px">✓</span>` : ""}</div></div>`;
+                let ed = "";
+                if (S.sel === d.key) {
+                  ed = `<div class="editor"><div class="mono" style="font-size:12px;margin-bottom:10px">Log: <strong>${esc(d.type)}</strong> · planned ${dlabel(d.km)} ${S.unit}</div>
+        <div class="row" style="align-items:center">
+          <input id="eKm" placeholder="actual ${S.unit}" value="${e && e.km != null ? dlabel(e.km) : ""}" style="width:100px">
+          <input id="eTime" placeholder="time mm:ss" value="${e && e.time ? esc(e.time) : ""}" style="width:110px">
+          <button class="btn done on" data-mark="${d.key}" data-plan="${d.km}">✓ Mark done</button>
+          <button class="btn ghost" data-skip="${d.key}">Skip</button>
+          ${e ? `<button class="btn ghost" data-clear="${d.key}">Clear</button>` : ""}
+        </div></div>`;
+                }
+                return row + ed;
               })
               .join("");
-            let editor = "";
-            if (S.sel && wk.days.some((d) => d.key === S.sel)) {
-              const d = wk.days.find((x) => x.key === S.sel);
-              const e = S.log[S.sel] || {};
-              editor = `<div class="editor"><div class="mono" style="font-size:12px;margin-bottom:10px">Log: <strong>${esc(d.type)}</strong> · planned ${dlabel(d.km)} ${S.unit}</div>
-        <div class="row" style="align-items:center">
-          <input id="eKm" placeholder="actual ${S.unit}" value="${e.km != null ? dlabel(e.km) : ""}" style="width:100px">
-          <input id="eTime" placeholder="time mm:ss" value="${e.time ? esc(e.time) : ""}" style="width:110px">
-          <button class="btn done on" data-mark="${S.sel}" data-plan="${d.km}">✓ Mark done</button>
-          <button class="btn ghost" data-skip="${S.sel}">Skip</button>
-          ${S.log[S.sel] ? `<button class="btn ghost" data-clear="${S.sel}">Clear</button>` : ""}
-        </div></div>`;
-            }
-            return `<div class="wk"><div class="h ${wk.phase === "Taper" ? "taper" : ""}">
+            return `<div class="wk" id="wk-${wk.week}"><div class="h ${wk.phase === "Taper" ? "taper" : ""}">
       <span style="font-family:'Anton',sans-serif;font-size:21px">W${String(wk.week).padStart(2, "0")}</span>
       <span class="tag">${wk.phase}</span>
-      <span class="mono" style="font-size:12px;color:#6f6a5d;margin-left:auto">${dlabel(Math.round(wk.total))} ${S.unit}</span></div>
-      <div class="days">${cells}</div>${editor}</div>`;
+      <span class="mono" style="font-size:12px;color:var(--mut);margin-left:auto">${dlabel(Math.round(wk.total))} ${S.unit}</span></div>
+      <div class="daylist">${cells}</div></div>`;
           })
           .join("");
         return `${S.warn ? `<div class="warn">${esc(S.warn)}</div>` : ""}
   <div class="row" style="align-items:center;gap:16px;margin-bottom:18px">
     <div style="flex:1;min-width:200px"><div class="mono" style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>${done}/${total} sessions</span><span>${dlabel(Math.round(kmL))} ${S.unit} logged</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>
-    <button class="btn ghost" id="newplan">New plan</button>
+    <div class="row" style="gap:6px"><button class="btn" id="ics">⤓ Calendar</button><button class="btn ghost" id="newplan">New plan</button></div>
   </div>
   ${todayHTML}${zonesHTML}
   <h2>${S.plan.length} weeks ${!v.has ? `<span class="mono" style="font-size:11px;color:var(--accent);margin-left:10px;text-transform:none;letter-spacing:0">add a recent effort for exact paces</span>` : ""}</h2>
@@ -1139,6 +1282,10 @@
             render();
             return;
           }
+          if (e.target.id === "ics" || e.target.closest("#ics")) {
+            buildICS();
+            return;
+          }
           if (e.target.id === "newplan") {
             S.plan = null;
             S.meta = null;
@@ -1173,31 +1320,92 @@
         } catch (err) {
           console.warn("load failed", err);
         }
+        if (S.tab === "plan") scrollPending = true;
         render();
       })();
 
-      // service worker + install prompt
+      // service worker
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () =>
           navigator.serviceWorker.register("sw.js").catch(() => {}),
         );
       }
+
+      // first-open install banner
+      const banner = $("#pwaBanner");
+      const isStandalone =
+        matchMedia("(display-mode: standalone)").matches ||
+        navigator.standalone === true;
+      const isIOS =
+        /iP(hone|ad|od)/.test(navigator.userAgent) && !window.MSStream;
+      const dismissBanner = (remember) => {
+        banner.classList.remove("show");
+        if (remember) localStorage.setItem("pwa-dismissed", "1");
+      };
       let deferred = null;
+      const showBanner = () => {
+        if (isStandalone || localStorage.getItem("pwa-dismissed")) return;
+        banner.classList.add("show");
+      };
       window.addEventListener("beforeinstallprompt", (e) => {
         e.preventDefault();
         deferred = e;
-        $("#install").style.display = "block";
+        $("#pwaInstall").style.display = "";
+        showBanner();
       });
-      $("#install").onclick = async () => {
+      if (isIOS && !isStandalone) {
+        $("#pwaInstall").style.display = "none";
+        $("#pwaMsg").innerHTML =
+          'Install PLAN-RUN.<br><small>Tap Share &#8593; then "Add to Home Screen".</small>';
+        showBanner();
+      }
+      $("#pwaInstall").onclick = async () => {
         if (!deferred) return;
         deferred.prompt();
-        await deferred.userChoice;
+        const r = await deferred.userChoice;
         deferred = null;
-        $("#install").style.display = "none";
+        dismissBanner(r && r.outcome === "accepted");
       };
-      window.addEventListener("appinstalled", () => {
-        $("#install").style.display = "none";
-      });
+      $("#pwaClose").onclick = () => dismissBanner(true);
+      window.addEventListener("appinstalled", () => dismissBanner(true));
+
+      // floating "Today" button + auto-scroll to current week (plan view)
+      let todayObserver = null;
+      let scrollPending = false;
+      const fab = $("#todayFab");
+      function currentWeekEl() {
+        if (!S.plan || !S.meta) return null;
+        const t = new Date();
+        t.setHours(0, 0, 0, 0);
+        for (const wk of S.plan) {
+          const start = addDays(S.meta.start, (wk.week - 1) * 7);
+          const end = addDays(S.meta.start, (wk.week - 1) * 7 + 6);
+          if (t >= start && t <= end)
+            return document.getElementById("wk-" + wk.week);
+        }
+        return null;
+      }
+      function scrollToToday() {
+        const el = currentWeekEl();
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      function setupTodayNav() {
+        if (todayObserver) todayObserver.disconnect();
+        fab.classList.remove("show");
+        if (S.tab !== "plan") return;
+        const el = currentWeekEl();
+        if (!el) return;
+        if (scrollPending) {
+          el.scrollIntoView({ block: "start" });
+          scrollPending = false;
+        }
+        todayObserver = new IntersectionObserver(
+          ([entry]) => fab.classList.toggle("show", !entry.isIntersecting),
+          { threshold: 0.05 },
+        );
+        todayObserver.observe(el);
+      }
+      fab.onclick = scrollToToday;
     </script>
   </body>
 </html>

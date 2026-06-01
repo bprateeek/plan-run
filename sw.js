@@ -1,10 +1,11 @@
 // Plan-Run service worker : cache-first app shell for offline use.
 // Bump CACHE when you change any cached file so clients refresh.
-const CACHE = "plan-run-v1";
+const CACHE = "plan-run-v2";
 const SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
+  "./icons/icon.svg",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-maskable-512.png",
