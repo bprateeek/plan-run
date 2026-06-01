@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#16140f" />
+    <title>Plan-Run: Race Training</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
+      :root {
+        --ink: #16140f;
+        --paper: #f4f1ea;
+        --accent: #ff4d1c;
+        --line: #dcd6c8;
+        --done: #5b8c5a;
+        --mut: #8a8576;
+        --z-easy: #5b8c5a;
+        --z-mar: #ff4d1c;
+        --z-thr: #c9851f;
+        --z-int: #b23a2e;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Archivo", system-ui, sans-serif;
+        padding: 26px 18px calc(70px + env(safe-area-inset-bottom));
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 880px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-family: "Anton", sans-serif;
+        font-size: 40px;
+        line-height: 0.95;
+        margin: 0;
+        text-transform: uppercase;
+      }
+      h2 {
+        font-family: "Anton", sans-serif;
+        font-size: 22px;
+        text-transform: uppercase;
+        margin: 0 0 12px;
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+      .head {
+        border-bottom: 2px solid var(--ink);
+        padding-bottom: 12px;
+        margin-bottom: 22px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .tabs {
+        display: flex;
+        gap: 6px;
+      }
+      .btn {
+        padding: 8px 13px;
+        border: 1.5px solid var(--ink);
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+      }
+      .btn.active {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .btn.sm {
+        padding: 8px 11px;
+      }
+      .btn.ghost {
+        border-color: var(--line);
+        color: var(--mut);
+      }
+      .btn.go {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        padding: 13px 30px;
+        font-family: "Anton", sans-serif;
+        font-size: 18px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .btn.done {
+        border-color: var(--done);
+        color: var(--done);
+      }
+      .btn.done.on {
+        background: var(--done);
+        color: #fff;
+      }
+      .grid {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        margin-bottom: 22px;
+      }
+      label.lab {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--mut);
+        margin-bottom: 8px;
+        display: block;
+      }
+      input,
+      select {
+        padding: 9px;
+        border: 1.5px solid var(--ink);
+        background: transparent;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        color: var(--ink);
+      }
+      input {
+        width: 100%;
+      }
+      .row {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .dash {
+        border: 1.5px dashed var(--line);
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+      .err {
+        color: #b23a2e;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        margin-top: 12px;
+      }
+      .warn {
+        border: 1.5px solid var(--accent);
+        padding: 10px 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        color: #8a3a1c;
+        background: #fbe9e2;
+      }
+      .bar {
+        height: 8px;
+        background: var(--line);
+      }
+      .bar > i {
+        display: block;
+        height: 100%;
+        background: var(--done);
+      }
+      .today {
+        border: 2px solid var(--accent);
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .zones {
+        display: grid;
+        gap: 9px;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      }
+      .zone {
+        border: 1.5px solid var(--ink);
+        padding: 11px 13px;
+      }
+      .zone .t {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+      .wk {
+        border: 1.5px solid var(--ink);
+        margin-bottom: 10px;
+      }
+      .wk .h {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .wk .h.taper {
+        background: #efe9da;
+      }
+      .days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+      }
+      .cell {
+        padding: 7px 7px 9px;
+        border-right: 1px solid var(--line);
+        min-height: 84px;
+        cursor: pointer;
+        position: relative;
+      }
+      .cell:last-child {
+        border-right: none;
+      }
+      .cell.rest {
+        background: #efe9da;
+        cursor: default;
+      }
+      .cell.done {
+        background: #e8f0e6;
+      }
+      .cell.skip {
+        background: #f0ece0;
+      }
+      .cell.today {
+        background: #fbe9e2;
+      }
+      .cell .dn {
+        display: flex;
+        justify-content: space-between;
+      }
+      .cell .ck {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        color: var(--done);
+        font-weight: 700;
+      }
+      .editor {
+        border-top: 1.5px dashed var(--line);
+        padding: 12px 14px;
+        background: #fbf9f3;
+      }
+      .tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border: 1px solid var(--ink);
+      }
+      .install {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: calc(14px + env(safe-area-inset-bottom));
+        background: var(--ink);
+        color: var(--paper);
+        padding: 10px 18px;
+        border: none;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        cursor: pointer;
+        display: none;
+        z-index: 5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="head">
+        <h1>Plan-Run<span style="color: var(--accent)">.</span></h1>
+        <div class="tabs">
+          <button class="btn" id="tab-setup">Setup</button>
+          <button class="btn" id="tab-plan">Plan</button>
+        </div>
+      </div>
+      <div id="app"></div>
+    </div>
+    <button class="install" id="install">Install app ↓</button>
+
+    <script>
+      "use strict";
+      // ===========================================================================
+      // PACE ENGINE - Daniels / Daniels-Gilbert VDOT
+      // ===========================================================================
+      const pctMax = (t) =>
+        0.8 +
+        0.1894393 * Math.exp(-0.012778 * t) +
+        0.2989558 * Math.exp(-0.1932605 * t);
+      const vo2 = (v) => -4.6 + 0.182258 * v + 0.000104 * v * v;
+      const vdotFromRace = (distM, timeMin) =>
+        vo2(distM / timeMin) / pctMax(timeMin);
+      const velForVO2 = (T) => {
+        const a = 0.000104,
+          b = 0.182258,
+          c = -4.6 - T;
+        return (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+      };
+      const paceMinPerKm = (vdot, frac) => 1000 / velForVO2(frac * vdot);
+      const ZONES = {
+        Easy: {
+          lo: 0.66,
+          hi: 0.74,
+          label: "Easy",
+          desc: "Conversational. The bulk of your running.",
+        },
+        Marathon: {
+          lo: 0.835,
+          hi: 0.85,
+          label: "Marathon",
+          desc: "Goal race effort. Controlled, rhythmic.",
+        },
+        Threshold: {
+          lo: 0.86,
+          hi: 0.88,
+          label: "Threshold",
+          desc: "Comfortably hard - ~1hr race pace.",
+        },
+        Interval: {
+          lo: 0.95,
+          hi: 0.98,
+          label: "Interval",
+          desc: "Hard. 3-5 min reps at ~5K effort.",
+        },
+      };
+      const ZCOL = {
+        Easy: "var(--z-easy)",
+        Marathon: "var(--z-mar)",
+        Threshold: "var(--z-thr)",
+        Interval: "var(--z-int)",
+        rest: "#b6b0a3",
+      };
+      function fmtPace(m) {
+        if (!isFinite(m) || m <= 0) return "—";
+        let mm = Math.floor(m),
+          s = Math.round((m - mm) * 60);
+        if (s === 60) {
+          s = 0;
+          mm++;
+        }
+        return mm + ":" + String(s).padStart(2, "0");
+      }
+
+      // ===========================================================================
+      // PLAN ENGINE - volume-driven periodization + periodized quality sessions
+      // ===========================================================================
+      const RACES = {
+        "5K": { km: 5, peakLong: 12, taper: 1, minWeeks: 6, perDay: 10 },
+        "10K": { km: 10, peakLong: 16, taper: 1, minWeeks: 8, perDay: 11 },
+        Half: { km: 21.1, peakLong: 21, taper: 2, minWeeks: 10, perDay: 12 },
+        Marathon: {
+          km: 42.2,
+          peakLong: 32,
+          taper: 3,
+          minWeeks: 12,
+          perDay: 13,
+        },
+      };
+      const DAY_TEMPLATES = {
+        1: ["rest", "rest", "rest", "rest", "rest", "rest", "long"],
+        2: ["rest", "q1", "rest", "rest", "rest", "rest", "long"],
+        3: ["rest", "q1", "rest", "easy", "rest", "rest", "long"],
+        4: ["rest", "q1", "easy", "rest", "easy", "rest", "long"],
+        5: ["rest", "q1", "easy", "q2", "rest", "recovery", "long"],
+        6: ["recovery", "q1", "easy", "q2", "easy", "rest", "long"],
+        7: ["recovery", "q1", "easy", "q2", "easy", "recovery", "long"],
+      };
+      const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+      function phaseFor(w, weeks, taper) {
+        const buildEnd = weeks - taper,
+          peakStart = buildEnd - 3;
+        if (w >= buildEnd) return "Taper";
+        if (w >= peakStart) return "Peak";
+        if (w < Math.round(buildEnd * 0.4)) return "Base";
+        return "Build";
+      }
+
+      // per-week phase + progress (0..1 through that phase)
+      function phaseInfos(weeks, taper) {
+        const ph = [];
+        for (let w = 0; w < weeks; w++) ph.push(phaseFor(w, weeks, taper));
+        return ph.map((p, w) => {
+          const mem = [];
+          ph.forEach((x, k) => {
+            if (x === p) mem.push(k);
+          });
+          const idx = mem.indexOf(w);
+          return { phase: p, p: mem.length > 1 ? idx / (mem.length - 1) : 1 };
+        });
+      }
+
+      function buildVolume(weeks, startVol, ceiling, taper) {
+        const v = [],
+          bw = weeks - taper;
+        let last = startVol;
+        for (let i = 0; i < bw; i++) {
+          const cut = (i + 1) % 4 === 0 && i !== bw - 1;
+          let x;
+          if (i === 0) {
+            x = startVol;
+            last = startVol;
+          } else if (cut) {
+            x = last * 0.75;
+          } else {
+            x = Math.min(last * 1.08, ceiling);
+            last = x;
+          }
+          v.push(x);
+        }
+        const peak = Math.max(...v, startVol);
+        (taper === 3
+          ? [0.75, 0.55, 0.4]
+          : taper === 2
+            ? [0.6, 0.4]
+            : [0.5]
+        ).forEach((f) => v.push(peak * f));
+        return v.map((x) => Math.round(x));
+      }
+      function buildLongRuns(weeks, startLong, peakLong, taper) {
+        const a = [],
+          bw = weeks - taper;
+        for (let i = 0; i < bw; i++) {
+          const t = bw > 1 ? i / (bw - 1) : 1;
+          let lr = startLong + (peakLong - startLong) * t;
+          if ((i + 1) % 4 === 0 && i !== bw - 1) lr *= 0.72;
+          a.push(lr);
+        }
+        (taper === 3
+          ? [0.78, 0.55, 0.32]
+          : taper === 2
+            ? [0.6, 0.35]
+            : [0.4]
+        ).forEach((f) => a.push(peakLong * f));
+        return a.map((x) => Math.round(x));
+      }
+      const pick = (list, p) =>
+        list[Math.min(list.length - 1, Math.round(p * (list.length - 1)))];
+
+      // PRIMARY quality session : progresses week-to-week within each phase
+      function q1Session(phase, p, race) {
+        if (phase === "Base")
+          return pick(
+            [
+              { type: "Strides", zone: "Easy", note: "easy + 6×20s strides" },
+              { type: "Strides", zone: "Easy", note: "easy + 8×20s strides" },
+              {
+                type: "Hills",
+                zone: "Interval",
+                note: "8×30s uphill hard, jog down",
+              },
+              {
+                type: "Cruise",
+                zone: "Threshold",
+                note: "2×6min @ T, 2min jog",
+              },
+            ],
+            p,
+          );
+        if (phase === "Build")
+          return pick(
+            [
+              {
+                type: "Threshold",
+                zone: "Threshold",
+                note: "3×1km @ T, 90s jog",
+              },
+              {
+                type: "Threshold",
+                zone: "Threshold",
+                note: "4×1km @ T, 90s jog",
+              },
+              {
+                type: "Threshold",
+                zone: "Threshold",
+                note: "2×2km @ T, 2min jog",
+              },
+              {
+                type: "Threshold",
+                zone: "Threshold",
+                note: "5×1km @ T, 75s jog",
+              },
+              {
+                type: "Tempo",
+                zone: "Threshold",
+                note: "continuous 20min @ T",
+              },
+              {
+                type: "Tempo",
+                zone: "Threshold",
+                note: "2×15min @ T, 3min jog",
+              },
+            ],
+            p,
+          );
+        if (phase === "Peak") {
+          if (race === "5K" || race === "10K")
+            return pick(
+              [
+                {
+                  type: "Intervals",
+                  zone: "Interval",
+                  note: "5×1km @ I, 2min jog",
+                },
+                {
+                  type: "Intervals",
+                  zone: "Interval",
+                  note: "6×1km @ I, 2min jog",
+                },
+                {
+                  type: "Intervals",
+                  zone: "Interval",
+                  note: "4×1200m @ I, 2min jog",
+                },
+              ],
+              p,
+            );
+          return pick(
+            [
+              {
+                type: "Intervals",
+                zone: "Interval",
+                note: "5×1km @ I, 2min jog",
+              },
+              {
+                type: "I + T",
+                zone: "Interval",
+                note: "4×1km @ I, then 2km @ T",
+              },
+              {
+                type: "Threshold",
+                zone: "Threshold",
+                note: "3×2km @ T, 2min jog",
+              },
+            ],
+            p,
+          );
+        }
+        return pick(
+          [
+            // Taper
+            {
+              type: "Sharpener",
+              zone: "Threshold",
+              note: "3×1km @ T, 90s jog",
+            },
+            {
+              type: "Sharpener",
+              zone: "Interval",
+              note: "4×400m @ I + 4 strides",
+            },
+            {
+              type: "Primer",
+              zone: "Marathon",
+              note: "2km @ MP + 4×100m strides",
+            },
+          ],
+          p,
+        );
+      }
+      // SECONDARY quality (only when used) - complementary stimulus
+      function q2Session(phase, p, race) {
+        const mp = race === "Marathon" || race === "Half";
+        if (phase === "Build")
+          return mp
+            ? pick(
+                [
+                  { type: "MP Run", zone: "Marathon", note: "5km @ MP" },
+                  { type: "MP Run", zone: "Marathon", note: "8km @ MP" },
+                  { type: "MP Run", zone: "Marathon", note: "10km @ MP" },
+                ],
+                p,
+              )
+            : pick(
+                [
+                  {
+                    type: "Reps",
+                    zone: "Interval",
+                    note: "8×400m @ I, 90s jog",
+                  },
+                  {
+                    type: "Reps",
+                    zone: "Interval",
+                    note: "10×400m @ I, 90s jog",
+                  },
+                  {
+                    type: "Reps",
+                    zone: "Interval",
+                    note: "6×600m @ I, 2min jog",
+                  },
+                ],
+                p,
+              );
+        if (phase === "Peak")
+          return mp
+            ? pick(
+                [
+                  { type: "MP Run", zone: "Marathon", note: "10km @ MP" },
+                  { type: "MP Run", zone: "Marathon", note: "13km @ MP" },
+                  {
+                    type: "Intervals",
+                    zone: "Interval",
+                    note: "4×1km @ I, 2min jog",
+                  },
+                ],
+                p,
+              )
+            : pick(
+                [
+                  {
+                    type: "Intervals",
+                    zone: "Interval",
+                    note: "5×1km @ I, 2min jog",
+                  },
+                  {
+                    type: "Reps",
+                    zone: "Interval",
+                    note: "8×400m @ I, 90s jog",
+                  },
+                ],
+                p,
+              );
+        if (phase === "Base")
+          return { type: "Easy", zone: "Easy", note: "easy + strides" };
+        return { type: "Easy", zone: "Easy", note: "easy" };
+      }
+
+      function buildPlan(o) {
+        const cfg = RACES[o.raceType];
+        const ceiling = Math.max(o.startVol, cfg.perDay * o.daysPerWeek);
+        const vols = buildVolume(o.weeks, o.startVol, ceiling, cfg.taper);
+        const longs = buildLongRuns(
+          o.weeks,
+          o.startLong,
+          cfg.peakLong,
+          cfg.taper,
+        );
+        const info = phaseInfos(o.weeks, cfg.taper);
+        const twoQ = !!o.goalTime && o.daysPerWeek >= 5;
+        const base = DAY_TEMPLATES[o.daysPerWeek];
+        const W = { q1: 1.15, q2: 1.05, easy: 1.0, recovery: 0.65 };
+        const out = [];
+        for (let w = 0; w < o.weeks; w++) {
+          const { phase, p } = info[w];
+          const isRace = w === o.weeks - 1;
+          let vol = vols[w];
+          let longRun =
+            o.daysPerWeek <= 2
+              ? longs[w]
+              : Math.min(longs[w], Math.round(vol * 0.55));
+          if (o.daysPerWeek === 1) vol = longRun;
+          if (longRun > vol) vol = longRun;
+          const other = Math.max(0, vol - longRun);
+          const tmpl = base.map((s) => (s === "q2" && !twoQ ? "easy" : s));
+          const fill = tmpl
+            .map((s, i) => ({ s, i }))
+            .filter((o2) => ["q1", "q2", "easy", "recovery"].includes(o2.s));
+          const totW = fill.reduce((a, o2) => a + (W[o2.s] || 1), 0) || 1;
+          const s1 = q1Session(phase, p, o.raceType),
+            s2 = q2Session(phase === "Peak" ? "Peak" : phase, p, o.raceType);
+          const mpFin =
+            phase === "Peak" &&
+            (o.raceType === "Marathon" || o.raceType === "Half");
+          const mpKm = mpFin ? Math.round(longRun * (0.22 + 0.13 * p)) : 0;
+          const days = tmpl.map((slot, i) => {
+            const key = "w" + w + "d" + i;
+            if (slot === "rest")
+              return { key, type: "Rest", km: 0, zone: "rest", note: "" };
+            if (slot === "long") {
+              if (isRace)
+                return {
+                  key,
+                  type: "RACE DAY",
+                  km: cfg.km,
+                  zone: "Marathon",
+                  note: o.goalTime ? "target " + o.goalTime : "race effort",
+                };
+              return {
+                key,
+                type: "Long Run",
+                km: longRun,
+                zone: "Easy",
+                note: mpFin ? "last " + mpKm + " @ MP" : "easy / steady",
+              };
+            }
+            const share = (W[slot] || 1) / totW;
+            let km = Math.round(other * share);
+            const isQ = slot === "q1" || slot === "q2";
+            km = Math.max(
+              isQ ? 6 : 3,
+              Math.min(km, Math.round(longRun * 0.85) || 6),
+            );
+            if (slot === "q1")
+              return { key, type: s1.type, km, zone: s1.zone, note: s1.note };
+            if (slot === "q2")
+              return { key, type: s2.type, km, zone: s2.zone, note: s2.note };
+            if (slot === "recovery")
+              return {
+                key,
+                type: "Recovery",
+                km,
+                zone: "Easy",
+                note: "very easy",
+              };
+            return { key, type: "Easy", km, zone: "Easy", note: "easy" };
+          });
+          out.push({
+            week: w + 1,
+            phase,
+            total: days.reduce((s, d) => s + d.km, 0),
+            days,
+          });
+        }
+        return out;
+      }
+
+      // ===========================================================================
+      // PERSISTENCE - IndexedDB (offline, local-first)
+      // ===========================================================================
+      function db() {
+        return new Promise((res, rej) => {
+          const r = indexedDB.open("runplan", 1);
+          r.onupgradeneeded = () => r.result.createObjectStore("kv");
+          r.onsuccess = () => res(r.result);
+          r.onerror = () => rej(r.error);
+        });
+      }
+      async function dbGet(k) {
+        const d = await db();
+        return new Promise((res, rej) => {
+          const t = d.transaction("kv").objectStore("kv").get(k);
+          t.onsuccess = () => res(t.result);
+          t.onerror = () => rej(t.error);
+        });
+      }
+      async function dbSet(k, v) {
+        const d = await db();
+        return new Promise((res, rej) => {
+          const tx = d.transaction("kv", "readwrite");
+          tx.objectStore("kv").put(v, k);
+          tx.oncomplete = () => res();
+          tx.onerror = () => rej(tx.error);
+        });
+      }
+
+      // ===========================================================================
+      // STATE + helpers
+      // ===========================================================================
+      const S = {
+        raceType: "Marathon",
+        daysPerWeek: 4,
+        goal: "finish",
+        unit: "km",
+        plan: null,
+        meta: null,
+        log: {},
+        sel: null,
+        tab: "setup",
+        err: "",
+        warn: "",
+      };
+      const $ = (s) => document.querySelector(s);
+      const app = $("#app");
+      const mondayOf = (d) => {
+        const x = new Date(d);
+        x.setHours(0, 0, 0, 0);
+        x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+        return x;
+      };
+      const addDays = (iso, n) => {
+        const x = new Date(iso);
+        x.setDate(x.getDate() + n);
+        return x;
+      };
+      const sameDay = (a, b) =>
+        a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate();
+      const fmtDate = (d) =>
+        d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
+      const toUnit = () => (S.unit === "mi" ? 1.609344 : 1);
+      const dlabel = (km) =>
+        S.unit === "mi" ? (km / 1.609344).toFixed(1) : km;
+      const parseTime = (s) => {
+        if (!s) return null;
+        const p = s.split(":").map(Number);
+        if (p.some(isNaN)) return null;
+        if (p.length === 3) return p[0] * 60 + p[1] + p[2] / 60;
+        if (p.length === 2) return p[0] + p[1] / 60;
+        return null;
+      };
+      function vinfo() {
+        const m = S.meta;
+        if (!m || !m.hasVdot) return { has: false, vdot: 0 };
+        return { has: true, vdot: m.vdot };
+      }
+      const esc = (s) =>
+        String(s).replace(
+          /[&<>"]/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+        );
+
+      async function persistPlan() {
+        await dbSet("plan", { plan: S.plan, meta: S.meta });
+      }
+      async function persistLog() {
+        await dbSet("log", S.log);
+      }
+
+      // ===========================================================================
+      // RENDER
+      // ===========================================================================
+      function setTab(t) {
+        S.tab = t;
+        render();
+      }
+      $("#tab-setup").onclick = () => setTab("setup");
+      $("#tab-plan").onclick = () => {
+        if (S.plan) setTab("plan");
+      };
+
+      function render() {
+        $("#tab-setup").classList.toggle("active", S.tab === "setup");
+        $("#tab-plan").classList.toggle("active", S.tab === "plan");
+        $("#tab-plan").style.opacity = S.plan ? 1 : 0.4;
+        app.innerHTML = S.tab === "setup" ? setupHTML() : planHTML();
+        if (S.tab === "setup") wireSetup();
+        else wirePlan();
+      }
+
+      function setupHTML() {
+        const races = Object.keys(RACES)
+          .map(
+            (r) =>
+              `<button class="btn rt ${S.raceType === r ? "active" : ""}" data-rt="${r}">${r}</button>`,
+          )
+          .join("");
+        const days = [1, 2, 3, 4, 5, 6, 7]
+          .map(
+            (d) =>
+              `<button class="btn sm dw ${S.daysPerWeek === d ? "active" : ""}" data-dw="${d}">${d}</button>`,
+          )
+          .join("");
+        const effOpts = Object.keys(RACES)
+          .map((r) => `<option value="${r}">${r}</option>`)
+          .join("");
+        return `
+  <div class="grid">
+    <div><label class="lab">Race</label><div class="row" id="rtRow">${races}</div></div>
+    <div><label class="lab">Race date</label><input type="date" id="raceDate"></div>
+    <div><label class="lab">Days / week</label><div class="row" id="dwRow">${days}</div></div>
+    <div><label class="lab">Current weekly volume (${S.unit})</label><input type="number" id="weekly" value="35"></div>
+    <div><label class="lab">Current longest run (${S.unit})</label><input type="number" id="longest" value="16"></div>
+    <div><label class="lab">Goal</label><div class="row" id="goalRow">
+      <button class="btn gl ${S.goal === "finish" ? "active" : ""}" data-gl="finish">Finish</button>
+      <button class="btn gl ${S.goal === "time" ? "active" : ""}" data-gl="time">Time</button></div>
+      <input type="text" id="goalTime" placeholder="3:45:00" style="margin-top:6px;display:${S.goal === "time" ? "block" : "none"}"></div>
+    <div><label class="lab">Units</label><div class="row" id="unitRow">
+      <button class="btn un ${S.unit === "km" ? "active" : ""}" data-un="km">km</button>
+      <button class="btn un ${S.unit === "mi" ? "active" : ""}" data-un="mi">mi</button></div></div>
+  </div>
+  <div class="dash">
+    <label class="lab">Recent hard effort → sets your paces (optional)</label>
+    <div class="row" style="align-items:center">
+      <select id="effDist">${effOpts}</select>
+      <span class="mono" style="font-size:13px">in</span>
+      <input type="text" id="effTime" placeholder="mm:ss or h:mm:ss" style="width:150px">
+      <span id="vdotOut" class="mono" style="font-family:'Anton',sans-serif;font-size:20px;color:var(--accent)"></span>
+    </div>
+  </div>
+  <button class="btn go" id="build">Build the plan →</button>
+  ${S.err ? `<p class="err">${esc(S.err)}</p>` : ""}
+  ${S.plan ? `<p style="font-size:12px;color:var(--mut);margin-top:12px">Building a new plan replaces your saved plan and clears its log.</p>` : ""}`;
+      }
+
+      function wireSetup() {
+        $("#rtRow").onclick = (e) => {
+          const b = e.target.closest("[data-rt]");
+          if (!b) return;
+          S.raceType = b.dataset.rt;
+          [...document.querySelectorAll(".rt")].forEach((x) =>
+            x.classList.toggle("active", x === b),
+          );
+        };
+        $("#dwRow").onclick = (e) => {
+          const b = e.target.closest("[data-dw]");
+          if (!b) return;
+          S.daysPerWeek = +b.dataset.dw;
+          [...document.querySelectorAll(".dw")].forEach((x) =>
+            x.classList.toggle("active", x === b),
+          );
+        };
+        $("#goalRow").onclick = (e) => {
+          const b = e.target.closest("[data-gl]");
+          if (!b) return;
+          S.goal = b.dataset.gl;
+          [...document.querySelectorAll(".gl")].forEach((x) =>
+            x.classList.toggle("active", x === b),
+          );
+          $("#goalTime").style.display = S.goal === "time" ? "block" : "none";
+        };
+        $("#unitRow").onclick = (e) => {
+          const b = e.target.closest("[data-un]");
+          if (!b) return;
+          S.unit = b.dataset.un;
+          render();
+        };
+        const upd = () => {
+          const t = parseTime($("#effTime").value);
+          $("#vdotOut").textContent = t
+            ? "VDOT " +
+              vdotFromRace(RACES[$("#effDist").value].km * 1000, t).toFixed(1)
+            : "";
+        };
+        $("#effTime").oninput = upd;
+        $("#effDist").onchange = upd;
+        $("#build").onclick = build;
+      }
+
+      function build() {
+        S.err = "";
+        S.warn = "";
+        const raceDate = $("#raceDate").value;
+        if (!raceDate) {
+          S.err = "Pick a race date.";
+          render();
+          return;
+        }
+        const weeks = Math.floor(
+          (new Date(raceDate) - new Date()) / 86400000 / 7,
+        );
+        const cfg = RACES[S.raceType];
+        if (weeks < cfg.minWeeks) {
+          S.err = `~${weeks} weeks until race. A ${S.raceType} plan wants ≥ ${cfg.minWeeks}.`;
+          render();
+          return;
+        }
+        if (weeks > 32) {
+          S.err = `That's ${weeks} weeks out : pick a date within ~32 weeks.`;
+          render();
+          return;
+        }
+        const km = (v) => (S.unit === "mi" ? v * 1.609344 : v);
+        const longest = km(+$("#longest").value || 0),
+          weekly = km(+$("#weekly").value || 0);
+        const startLong = Math.max(longest, Math.round(cfg.peakLong * 0.4));
+        const startVol = Math.max(weekly, startLong, S.daysPerWeek * 4);
+        const goalTime =
+          S.goal === "time" ? $("#goalTime").value || null : null;
+        const t = parseTime($("#effTime").value);
+        if (
+          S.daysPerWeek <= 2 &&
+          (S.raceType === "Marathon" || S.raceType === "Half")
+        )
+          S.warn = `${S.daysPerWeek} day${S.daysPerWeek > 1 ? "s" : ""}/week is below what's typically safe to finish a ${S.raceType}. Plan is built around the long run - treat it as a floor and add easy days when you can.`;
+        S.plan = buildPlan({
+          raceType: S.raceType,
+          weeks,
+          startLong,
+          startVol,
+          daysPerWeek: S.daysPerWeek,
+          goalTime,
+        });
+        S.meta = {
+          raceType: S.raceType,
+          unit: S.unit,
+          goalTime,
+          hasVdot: !!t,
+          vdot: t ? vdotFromRace(RACES[$("#effDist").value].km * 1000, t) : 0,
+          start: mondayOf(new Date()).toISOString(),
+          daysPerWeek: S.daysPerWeek,
+        };
+        S.log = {};
+        S.sel = null;
+        S.tab = "plan";
+        persistPlan();
+        persistLog();
+        render();
+      }
+
+      function planHTML() {
+        if (!S.plan) return "";
+        const v = vinfo();
+        const tu = toUnit();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        // stats
+        let total = 0,
+          done = 0,
+          kmL = 0,
+          todayCell = null;
+        S.plan.forEach((wk) =>
+          wk.days.forEach((d, i) => {
+            if (d.type !== "Rest") {
+              total++;
+              const e = S.log[d.key];
+              if (e && e.status === "done") {
+                done++;
+                kmL += e.km != null ? e.km : d.km;
+              }
+              const dt = addDays(S.meta.start, (wk.week - 1) * 7 + i);
+              if (sameDay(dt, today)) todayCell = { wk: wk.week, i, day: d };
+            }
+          }),
+        );
+        const pct = total ? (done / total) * 100 : 0;
+        let zonesHTML = "";
+        if (v.has) {
+          zonesHTML =
+            `<div style="margin-bottom:26px"><h2>Your paces</h2><div class="zones">` +
+            Object.entries(ZONES)
+              .map(([k, z]) => {
+                const lo = fmtPace(paceMinPerKm(v.vdot, z.hi) * tu),
+                  hi = fmtPace(paceMinPerKm(v.vdot, z.lo) * tu);
+                const rng =
+                  lo === hi ? `${lo} /${S.unit}` : `${lo}–${hi} /${S.unit}`;
+                return `<div class="zone" style="border-left:5px solid ${ZCOL[k]}"><div class="t"><span class="mono" style="font-weight:700;font-size:13px;text-transform:uppercase">${z.label}</span><span class="mono" style="font-size:15px;font-weight:700;color:${ZCOL[k]}">${rng}</span></div><p style="margin:5px 0 0;font-size:12px;color:#6f6a5d">${z.desc}</p></div>`;
+              })
+              .join("") +
+            `</div></div>`;
+        }
+        const todayHTML = todayCell
+          ? `<div class="today"><span class="mono" style="font-size:11px;letter-spacing:.1em;color:var(--accent);text-transform:uppercase">Today</span>
+    <span style="font-family:'Anton',sans-serif;font-size:22px">${esc(todayCell.day.type)}</span>
+    ${todayCell.day.km > 0 ? `<span class="mono" style="font-size:16px">${dlabel(todayCell.day.km)} ${S.unit}</span>` : ""}
+    <span style="font-size:12px;color:var(--mut)">${esc(todayCell.day.note)}</span>
+    <button class="btn done ${S.log[todayCell.day.key] && S.log[todayCell.day.key].status === "done" ? "on" : ""}" data-quickdone="${todayCell.day.key}" style="margin-left:auto">✓ Done</button></div>`
+          : "";
+        const weeks = S.plan
+          .map((wk) => {
+            const cells = wk.days
+              .map((d, i) => {
+                const e = S.log[d.key];
+                const dt = addDays(S.meta.start, (wk.week - 1) * 7 + i);
+                const isToday = sameDay(dt, today);
+                const isRest = d.type === "Rest";
+                const cls = ["cell"];
+                if (isRest) cls.push("rest");
+                else if (e && e.status === "done") cls.push("done");
+                else if (e && e.status === "skipped") cls.push("skip");
+                else if (isToday) cls.push("today");
+                const body = isRest
+                  ? `<div class="mono" style="font-size:11px;color:#b6b0a3;margin-top:8px">rest</div>`
+                  : `<div style="font-weight:700;font-size:11.5px;margin-top:3px;color:${d.type === "RACE DAY" ? "var(--accent)" : "var(--ink)"};${e && e.status === "skipped" ? "text-decoration:line-through" : ""}">${esc(d.type)}</div>
+          ${d.km > 0 ? `<div class="mono" style="font-size:13px;font-weight:700">${dlabel(e && e.km != null ? e.km : d.km)}<span style="font-size:9px;color:#a39e90"> ${S.unit}</span></div>` : ""}
+          <div style="font-size:9px;color:var(--mut);margin-top:1px;line-height:1.2">${esc(d.note)}</div>
+          ${e && e.status === "done" ? `<span class="ck">✓</span>` : ""}`;
+                return `<div class="${cls.join(" ")}" ${isRest ? "" : `data-cell="${d.key}"`}>
+        <div class="dn"><span class="mono" style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:${isToday ? "var(--accent)" : "#a39e90"};font-weight:${isToday ? 700 : 400}">${DAY_NAMES[i]}</span>
+        <span class="mono" style="font-size:8px;color:#bcb6a8">${fmtDate(dt)}</span></div>${body}</div>`;
+              })
+              .join("");
+            let editor = "";
+            if (S.sel && wk.days.some((d) => d.key === S.sel)) {
+              const d = wk.days.find((x) => x.key === S.sel);
+              const e = S.log[S.sel] || {};
+              editor = `<div class="editor"><div class="mono" style="font-size:12px;margin-bottom:10px">Log: <strong>${esc(d.type)}</strong> · planned ${dlabel(d.km)} ${S.unit}</div>
+        <div class="row" style="align-items:center">
+          <input id="eKm" placeholder="actual ${S.unit}" value="${e.km != null ? dlabel(e.km) : ""}" style="width:100px">
+          <input id="eTime" placeholder="time mm:ss" value="${e.time ? esc(e.time) : ""}" style="width:110px">
+          <button class="btn done on" data-mark="${S.sel}" data-plan="${d.km}">✓ Mark done</button>
+          <button class="btn ghost" data-skip="${S.sel}">Skip</button>
+          ${S.log[S.sel] ? `<button class="btn ghost" data-clear="${S.sel}">Clear</button>` : ""}
+        </div></div>`;
+            }
+            return `<div class="wk"><div class="h ${wk.phase === "Taper" ? "taper" : ""}">
+      <span style="font-family:'Anton',sans-serif;font-size:21px">W${String(wk.week).padStart(2, "0")}</span>
+      <span class="tag">${wk.phase}</span>
+      <span class="mono" style="font-size:12px;color:#6f6a5d;margin-left:auto">${dlabel(Math.round(wk.total))} ${S.unit}</span></div>
+      <div class="days">${cells}</div>${editor}</div>`;
+          })
+          .join("");
+        return `${S.warn ? `<div class="warn">${esc(S.warn)}</div>` : ""}
+  <div class="row" style="align-items:center;gap:16px;margin-bottom:18px">
+    <div style="flex:1;min-width:200px"><div class="mono" style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>${done}/${total} sessions</span><span>${dlabel(Math.round(kmL))} ${S.unit} logged</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>
+    <button class="btn ghost" id="newplan">New plan</button>
+  </div>
+  ${todayHTML}${zonesHTML}
+  <h2>${S.plan.length} weeks ${!v.has ? `<span class="mono" style="font-size:11px;color:var(--accent);margin-left:10px;text-transform:none;letter-spacing:0">add a recent effort for exact paces</span>` : ""}</h2>
+  ${weeks}`;
+      }
+
+      function wirePlan() {
+        app.onclick = (e) => {
+          const c = e.target.closest("[data-cell]");
+          const qd = e.target.closest("[data-quickdone]");
+          const mk = e.target.closest("[data-mark]");
+          const sk = e.target.closest("[data-skip]");
+          const cl = e.target.closest("[data-clear]");
+          if (qd) {
+            const k = qd.dataset.quickdone;
+            S.log[k] = { ...(S.log[k] || {}), status: "done" };
+            persistLog();
+            render();
+            return;
+          }
+          if (mk) {
+            const k = mk.dataset.mark,
+              plan = +mk.dataset.plan;
+            const kmv = $("#eKm").value,
+              tv = $("#eTime").value;
+            const km =
+              kmv === "" ? plan : +kmv * (S.unit === "mi" ? 1.609344 : 1);
+            S.log[k] = { status: "done", km, time: tv };
+            S.sel = null;
+            persistLog();
+            render();
+            return;
+          }
+          if (sk) {
+            S.log[sk.dataset.skip] = {
+              ...(S.log[sk.dataset.skip] || {}),
+              status: "skipped",
+            };
+            S.sel = null;
+            persistLog();
+            render();
+            return;
+          }
+          if (cl) {
+            delete S.log[cl.dataset.clear];
+            S.sel = null;
+            persistLog();
+            render();
+            return;
+          }
+          if (c) {
+            const k = c.dataset.cell;
+            S.sel = S.sel === k ? null : k;
+            render();
+            return;
+          }
+          if (e.target.id === "newplan") {
+            S.plan = null;
+            S.meta = null;
+            S.log = {};
+            S.sel = null;
+            S.tab = "setup";
+            dbSet("plan", null);
+            dbSet("log", {});
+            render();
+          }
+        };
+      }
+
+      // ===========================================================================
+      // BOOT
+      // ===========================================================================
+      (async function () {
+        try {
+          const p = await dbGet("plan");
+          const l = await dbGet("log");
+          if (p && p.plan) {
+            S.plan = p.plan;
+            S.meta = p.meta;
+            if (p.meta) {
+              S.raceType = p.meta.raceType;
+              S.unit = p.meta.unit;
+              S.daysPerWeek = p.meta.daysPerWeek;
+            }
+            S.tab = "plan";
+          }
+          if (l) S.log = l;
+        } catch (err) {
+          console.warn("load failed", err);
+        }
+        render();
+      })();
+
+      // service worker + install prompt
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () =>
+          navigator.serviceWorker.register("sw.js").catch(() => {}),
+        );
+      }
+      let deferred = null;
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferred = e;
+        $("#install").style.display = "block";
+      });
+      $("#install").onclick = async () => {
+        if (!deferred) return;
+        deferred.prompt();
+        await deferred.userChoice;
+        deferred = null;
+        $("#install").style.display = "none";
+      };
+      window.addEventListener("appinstalled", () => {
+        $("#install").style.display = "none";
+      });
+    </script>
+  </body>
+</html>
