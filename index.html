@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <meta name="theme-color" content="#003049" />
+    <meta name="theme-color" content="#000000" />
     <title>Plan-Run: Race Training</title>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
@@ -14,18 +14,26 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Saira+Condensed:wght@600;700;800&display=swap");
       :root {
-        --ink: #003049;
-        --paper: #fdf0d5;
-        --accent: #c1121f;
-        --line: #e3d4ad;
-        --done: #669bbc;
-        --mut: #5f7d8c;
-        --z-easy: #669bbc;
-        --z-mar: #c1121f;
-        --z-thr: #780000;
-        --z-int: #003049;
+        color-scheme: dark;
+        --ink: #ffffff;
+        --paper: #000000;
+        --accent: #a4ff00;
+        --line: #2a2e2c;
+        --done: #00e5ff;
+        --mut: #7e8a85;
+        --z-easy: #00e5ff;
+        --z-mar: #a4ff00;
+        --z-thr: #ff5e00;
+        --z-int: #ff2d55;
+        --surface: #0d0d0d;
+        --tint-done: rgba(0, 229, 255, 0.12);
+        --tint-skip: rgba(255, 255, 255, 0.06);
+        --tint-today: rgba(164, 255, 0, 0.14);
+        --tint-taper: rgba(164, 255, 0, 0.1);
+        --warn-bd: #ff2d55;
+        --warn-bg: rgba(255, 45, 85, 0.12);
       }
       * {
         box-sizing: border-box;
@@ -34,7 +42,7 @@
         margin: 0;
         background: var(--paper);
         color: var(--ink);
-        font-family: "Archivo", system-ui, sans-serif;
+        font-family: "Barlow", system-ui, sans-serif;
         padding: 18px 14px calc(64px + env(safe-area-inset-bottom));
         -webkit-font-smoothing: antialiased;
         overflow-wrap: anywhere;
@@ -44,15 +52,19 @@
         margin: 0 auto;
       }
       h1 {
-        font-family: "Anton", sans-serif;
-        font-size: 40px;
-        line-height: 0.95;
+        font-family: "Saira Condensed", sans-serif;
+        font-weight: 800;
+        font-size: 44px;
+        line-height: 0.92;
+        letter-spacing: 0.01em;
         margin: 0;
         text-transform: uppercase;
       }
       h2 {
-        font-family: "Anton", sans-serif;
-        font-size: 22px;
+        font-family: "Saira Condensed", sans-serif;
+        font-weight: 700;
+        font-size: 24px;
+        letter-spacing: 0.01em;
         text-transform: uppercase;
         margin: 0 0 12px;
       }
@@ -96,12 +108,13 @@
       }
       .btn.go {
         background: var(--accent);
-        color: #fff;
+        color: var(--paper);
         border: none;
         padding: 13px 30px;
-        font-family: "Anton", sans-serif;
-        font-size: 18px;
-        letter-spacing: 0.04em;
+        font-family: "Saira Condensed", sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
       }
       .btn.done {
@@ -110,7 +123,7 @@
       }
       .btn.done.on {
         background: var(--done);
-        color: #fff;
+        color: var(--paper);
       }
       .grid {
         display: grid;
@@ -140,6 +153,19 @@
       input {
         width: 100%;
       }
+      input[type="date"] {
+        -webkit-appearance: none;
+        appearance: none;
+        min-width: 0;
+      }
+      input[type="date"]::-webkit-date-and-time-value {
+        text-align: left;
+        margin: 0;
+      }
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        margin-left: auto;
+        filter: invert(1);
+      }
       .row {
         display: flex;
         gap: 6px;
@@ -157,12 +183,12 @@
         margin-top: 12px;
       }
       .warn {
-        border: 1.5px solid var(--accent);
+        border: 1.5px solid var(--warn-bd);
         padding: 10px 14px;
         margin-bottom: 16px;
         font-size: 13px;
-        color: #780000;
-        background: #fbe1e0;
+        color: var(--warn-bd);
+        background: var(--warn-bg);
       }
       .bar {
         height: 8px;
@@ -208,7 +234,7 @@
         border-bottom: 1px solid var(--line);
       }
       .wk .h.taper {
-        background: #f3e6c4;
+        background: var(--tint-taper);
       }
       .daylist {
         display: flex;
@@ -231,13 +257,13 @@
         cursor: default;
       }
       .drow.done {
-        background: #e2edf3;
+        background: var(--tint-done);
       }
       .drow.skip {
-        background: #efe3c6;
+        background: var(--tint-skip);
       }
       .drow.today {
-        background: #fbe1e0;
+        background: var(--tint-today);
       }
       .drow .dt {
         flex: 0 0 88px;
@@ -256,7 +282,7 @@
       .editor {
         border-top: 1.5px dashed var(--line);
         padding: 12px 14px;
-        background: #fdf6e3;
+        background: var(--surface);
       }
       .tag {
         font-family: "JetBrains Mono", monospace;
@@ -271,8 +297,9 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: var(--ink);
-        color: var(--paper);
+        background: var(--surface);
+        color: var(--ink);
+        border-top: 1.5px solid var(--accent);
         padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
         display: none;
         align-items: center;
@@ -289,7 +316,7 @@
         line-height: 1.3;
       }
       .pwa .msg small {
-        color: var(--steel, #9bbdd6);
+        color: var(--mut);
         font-size: 11px;
       }
       .pwa button {
@@ -299,13 +326,13 @@
       }
       #pwaInstall {
         background: var(--accent);
-        color: #fff;
+        color: var(--paper);
         border: none;
         padding: 10px 14px;
       }
       #pwaClose {
         background: transparent;
-        color: var(--paper);
+        color: var(--ink);
         border: none;
         font-size: 20px;
         line-height: 1;
@@ -316,7 +343,7 @@
         right: 14px;
         bottom: calc(16px + env(safe-area-inset-bottom));
         background: var(--accent);
-        color: #fff;
+        color: var(--paper);
         border: none;
         border-radius: 22px;
         padding: 10px 16px;
@@ -324,7 +351,7 @@
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        box-shadow: 0 3px 10px rgba(0, 48, 73, 0.35);
+        box-shadow: 0 3px 10px rgba(164, 255, 0, 0.35);
         display: none;
         z-index: 15;
       }
@@ -401,7 +428,7 @@
         Marathon: "var(--z-mar)",
         Threshold: "var(--z-thr)",
         Interval: "var(--z-int)",
-        rest: "#9aa7ad",
+        rest: "#6b7280",
       };
       function fmtPace(m) {
         if (!isFinite(m) || m <= 0) return "—";
@@ -890,7 +917,9 @@
         const icsDate = (d) =>
           `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
         const escICS = (s) =>
-          String(s).replace(/[\\;,]/g, (c) => "\\" + c).replace(/\n/g, "\\n");
+          String(s)
+            .replace(/[\\;,]/g, (c) => "\\" + c)
+            .replace(/\n/g, "\\n");
         const fold = (line) => {
           // RFC 5545: lines longer than 75 octets are folded with CRLF + space
           let out = "";
@@ -1017,7 +1046,7 @@
       <select id="effDist">${effOpts}</select>
       <span class="mono" style="font-size:13px">in</span>
       <input type="text" id="effTime" placeholder="mm:ss or h:mm:ss" style="width:150px">
-      <span id="vdotOut" class="mono" style="font-family:'Anton',sans-serif;font-size:20px;color:var(--accent)"></span>
+      <span id="vdotOut" class="mono" style="font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:22px;color:var(--accent)"></span>
     </div>
   </div>
   <button class="btn go" id="build">Build the plan →</button>
@@ -1173,7 +1202,7 @@
         }
         const todayHTML = todayCell
           ? `<div class="today"><span class="mono" style="font-size:11px;letter-spacing:.1em;color:var(--accent);text-transform:uppercase">Today</span>
-    <span style="font-family:'Anton',sans-serif;font-size:22px">${esc(todayCell.day.type)}</span>
+    <span style="font-family:'Saira Condensed',sans-serif;font-weight:700;text-transform:uppercase;font-size:24px">${esc(todayCell.day.type)}</span>
     ${todayCell.day.km > 0 ? `<span class="mono" style="font-size:16px">${dlabel(todayCell.day.km)} ${S.unit}</span>` : ""}
     <span style="font-size:12px;color:var(--mut)">${esc(todayCell.day.note)}</span>
     <button class="btn done ${S.log[todayCell.day.key] && S.log[todayCell.day.key].status === "done" ? "on" : ""}" data-quickdone="${todayCell.day.key}" style="margin-left:auto">✓ Done</button></div>`
@@ -1191,7 +1220,7 @@
                 else if (e && e.status === "done") cls.push("done");
                 else if (e && e.status === "skipped") cls.push("skip");
                 else if (isToday) cls.push("today");
-                const dayCol = `<div class="dt"><div class="mono" style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:${isToday ? "var(--accent)" : "var(--mut)"};font-weight:${isToday ? 700 : 400}">${DAY_NAMES[i]}</div><div class="mono" style="font-size:10px;color:#9aa7ad">${fmtDate(dt)}</div></div>`;
+                const dayCol = `<div class="dt"><div class="mono" style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:${isToday ? "var(--accent)" : "var(--mut)"};font-weight:${isToday ? 700 : 400}">${DAY_NAMES[i]}</div><div class="mono" style="font-size:10px;color:var(--mut)">${fmtDate(dt)}</div></div>`;
                 if (isRest) {
                   return `<div class="${cls.join(" ")}">${dayCol}<div class="wo mono" style="font-size:11px">rest</div></div>`;
                 }
@@ -1200,7 +1229,7 @@
           <div style="font-weight:700;font-size:14px;color:${d.type === "RACE DAY" ? "var(--accent)" : "var(--ink)"};${e && e.status === "skipped" ? "text-decoration:line-through" : ""}">${esc(d.type)}</div>
           <div style="font-size:11px;color:var(--mut)">${esc(d.note)}</div>
         </div>
-        <div class="di">${d.km > 0 ? `<span class="mono" style="font-size:14px;font-weight:700">${dlabel(e && e.km != null ? e.km : d.km)}</span><span class="mono" style="font-size:10px;color:#9aa7ad"> ${S.unit}</span>` : ""}${e && e.status === "done" ? `<span style="color:var(--done);font-weight:700;margin-left:6px">✓</span>` : ""}</div></div>`;
+        <div class="di">${d.km > 0 ? `<span class="mono" style="font-size:14px;font-weight:700">${dlabel(e && e.km != null ? e.km : d.km)}</span><span class="mono" style="font-size:10px;color:var(--mut)"> ${S.unit}</span>` : ""}${e && e.status === "done" ? `<span style="color:var(--done);font-weight:700;margin-left:6px">✓</span>` : ""}</div></div>`;
                 let ed = "";
                 if (S.sel === d.key) {
                   ed = `<div class="editor"><div class="mono" style="font-size:12px;margin-bottom:10px">Log: <strong>${esc(d.type)}</strong> · planned ${dlabel(d.km)} ${S.unit}</div>
@@ -1216,7 +1245,7 @@
               })
               .join("");
             return `<div class="wk" id="wk-${wk.week}"><div class="h ${wk.phase === "Taper" ? "taper" : ""}">
-      <span style="font-family:'Anton',sans-serif;font-size:21px">W${String(wk.week).padStart(2, "0")}</span>
+      <span style="font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:23px">W${String(wk.week).padStart(2, "0")}</span>
       <span class="tag">${wk.phase}</span>
       <span class="mono" style="font-size:12px;color:var(--mut);margin-left:auto">${dlabel(Math.round(wk.total))} ${S.unit}</span></div>
       <div class="daylist">${cells}</div></div>`;
