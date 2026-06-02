@@ -131,6 +131,12 @@
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         margin-bottom: 22px;
       }
+      @media (max-width: 600px) {
+        .grid {
+          grid-template-columns: 1fr;
+          gap: 22px;
+        }
+      }
       label.lab {
         font-family: "JetBrains Mono", monospace;
         font-size: 11px;
